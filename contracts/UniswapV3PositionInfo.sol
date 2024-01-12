@@ -23,9 +23,12 @@ contract UniswapV3PositionInfo {
     function getPositionAmounts(uint256 tokenId, address poolAddress) 
         public 
         view 
-        returns (uint256 amount0, uint256 amount1) 
+        returns (uint256 amount0, uint256 amount1, address token0, address token1)
     {
         INonfungiblePositionManager.Position memory position = positionManager.positions(tokenId);
+        token0 = position.token0;
+        token1 = position.token1;
+
         IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
 
         (uint160 sqrtPriceX96, int24 tick,,,,,) = pool.slot0();

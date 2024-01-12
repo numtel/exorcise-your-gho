@@ -46,7 +46,7 @@ contract UniswapV3PositionInfoTest is Test {
         uint256 tokenId = 1; // Example NFT token ID
 
         // Call the function and assert results
-        (uint256 amount0, uint256 amount1) = positionInfo.getPositionAmounts(tokenId, address(pool));
+        (uint256 amount0, uint256 amount1,,) = positionInfo.getPositionAmounts(tokenId, address(pool));
 
         // Assert the expected amounts (replace these with expected values)
         assertEq(amount0, 0); // Example expected amount for token0
