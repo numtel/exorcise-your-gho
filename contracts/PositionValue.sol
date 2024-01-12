@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../contracts/IChainlinkFeed.sol";
+import "./IChainlinkFeed.sol";
+import "./IPositionValue.sol";
 
-contract PositionValue {
+contract PositionValue is IPositionValue {
   error LENGTH_MISMATCH();
   error UNKNOWN_TOKEN();
 
@@ -28,8 +29,8 @@ contract PositionValue {
     if(feedDecimals0 != feedDecimals1)
       revert LENGTH_MISMATCH();
 
-    uint8 decimals0 = IERC20(token0).decimals();
-    uint8 decimals1 = IERC20(token1).decimals();
+    uint8 decimals0 = IERC20decimals(token0).decimals();
+    uint8 decimals1 = IERC20decimals(token1).decimals();
     uint256 price0 = amount0 * uint256(feed0.latestAnswer());
     uint256 price1 = amount1 * uint256(feed1.latestAnswer());
 
@@ -47,6 +48,6 @@ contract PositionValue {
   }
 }
 
-interface IERC20 {
+interface IERC20decimals {
   function decimals() external view returns(uint8);
 }

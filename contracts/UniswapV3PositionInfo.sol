@@ -21,7 +21,7 @@ contract UniswapV3PositionInfo {
     uint160 private constant sqrtPricePrecision = 79228162514264337593543950336;
 
     function getPositionAmounts(uint256 tokenId, address poolAddress) 
-        public 
+        external 
         view 
         returns (uint256 amount0, uint256 amount1, address token0, address token1)
     {
