@@ -12,3 +12,9 @@ docs/
 
 # Dotenv file
 .env
+
+
+*.swp
+*.swo
+node_modules
+
