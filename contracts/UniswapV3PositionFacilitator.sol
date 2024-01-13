@@ -13,7 +13,8 @@ import "./IPositionValue.sol";
 import "./IUniswapV3PositionInfo.sol";
 
 contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Receiver, IERC4906, IGhoFacilitator {
-  error INVALID_POSITION_MANAGER();
+  error MINTS_PAUSED();
+  error LIQUIDATIONS_PAUSED();
   error ONLY_POSITION_OWNER();
   error MINT_OVERFLOW();
   error REPAY_UNDERFLOW();
@@ -23,6 +24,8 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
   event TokenUnwrapped(uint256 indexed tokenId, address indexed recipient);
   event GhoMinted(uint256 indexed tokenId, uint256 amount);
   event GhoRepaid(uint256 indexed tokenId, uint256 amount);
+  event PauseMintsChanged(bool oldValue, bool newValue);
+  event PauseLiquidationsChanged(bool oldValue, bool newValue);
 
   uint256 public constant MAX_LTV = 900; // Don't allow minting more than 90% ltv
   uint256 public constant LIQUIDATE = 950; // Allow liquidations at 95% ltv
@@ -33,6 +36,8 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
   address private _ghoTreasury;
   IPositionValue public valuer;
   IUniswapV3PositionInfo public positionInfo;
+  bool public pauseMints;
+  bool public pauseLiquidations;
 
   mapping(uint256 => uint256) public ghoMintedByTokenId;
 
@@ -72,6 +77,7 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
   }
 
   function _mintGho(uint256 tokenId, uint256 mintAmount) internal {
+    if(pauseMints) revert MINTS_PAUSED();
     ghoMintedByTokenId[tokenId] += mintAmount;
     uint256 maxLTV = (positionValue(tokenId) * MAX_LTV) / BASIS;
     if((ghoMintedByTokenId[tokenId] / GHO_DECIMALS) > maxLTV)
@@ -91,15 +97,18 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
   function repayGhoAndUnwrap(uint256 tokenId) external {
     if(ownerOf(tokenId) != msg.sender)
       revert ONLY_POSITION_OWNER();
+    _burn(tokenId);
     repayGho(tokenId, ghoMintedByTokenId[tokenId]);
     IERC721(positionInfo.positionManager()).safeTransferFrom(address(this), msg.sender, tokenId);
     emit TokenUnwrapped(tokenId, msg.sender);
   }
 
   function liquidate(uint256 tokenId) external {
+    if(pauseLiquidations) revert LIQUIDATIONS_PAUSED();
     uint256 minLiquidate = (positionValue(tokenId) * LIQUIDATE) / BASIS;
     if((ghoMintedByTokenId[tokenId] / GHO_DECIMALS) < minLiquidate)
       revert BELOW_LIQUIDATION_THRESHOLD();
+    _burn(tokenId);
     repayGho(tokenId, ghoMintedByTokenId[tokenId]);
     IERC721(positionInfo.positionManager()).safeTransferFrom(address(this), msg.sender, tokenId);
     emit TokenUnwrapped(tokenId, msg.sender);
@@ -137,5 +146,15 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
     address oldGhoTreasury = _ghoTreasury;
     _ghoTreasury = newGhoTreasury;
     emit GhoTreasuryUpdated(oldGhoTreasury, newGhoTreasury);
+  }
+
+  function updateStatus(bool _pauseMints, bool _pauseLiquidations) external onlyOwner {
+    if(_pauseMints != pauseMints)
+      emit PauseMintsChanged(pauseMints, !pauseMints);
+    if(_pauseLiquidations != pauseLiquidations)
+      emit PauseLiquidationsChanged(pauseLiquidations, !pauseLiquidations);
+
+    pauseMints = _pauseMints;
+    pauseLiquidations = _pauseLiquidations;
   }
 }
