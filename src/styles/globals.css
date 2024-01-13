@@ -20,7 +20,7 @@ a {
   text-decoration: none;
 }
 
-h1 {
+h1.logo {
   background-image: url(logo-light.png);
   background-repeat: no-repeat;
   background-position: center 0;
@@ -39,7 +39,7 @@ h1 {
     color: #fff;
   }
 
-  h1 {
+  h1.logo {
     background-image: url(logo-dark.png);
   }
 }
