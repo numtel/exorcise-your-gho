@@ -1,0 +1,45 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  margin: 0;
+  max-width: 100vw;
+}
+
+body {
+  background: #ffe5ce;
+  color: #000;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1 {
+  background-image: url(logo-light.png);
+  background-repeat: no-repeat;
+  background-position: center 0;
+  background-size: contain;
+  padding:300px 0 0 0;
+  text-align:center;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background: #001a31;
+    color: #fff;
+  }
+
+  h1 {
+    background-image: url(logo-dark.png);
+  }
+}
