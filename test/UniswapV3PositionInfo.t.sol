@@ -5,18 +5,21 @@ pragma abicoder v2;
 import "../contracts/UniswapV3PositionInfo.sol";
 import "./mock/MockNonfungiblePositionManager.sol";
 import "./mock/MockUniswapV3Pool.sol";
+import "./mock/MockUniswapV3Factory.sol";
 import "forge-std/Test.sol";
 
 // From ChatGPT4, except position #37 data
 contract UniswapV3PositionInfoTest is Test {
     MockNonfungiblePositionManager positionManager;
     MockUniswapV3Pool pool;
+    MockUniswapV3Factory factory;
     UniswapV3PositionInfo positionInfo;
 
     function setUp() public {
         positionManager = new MockNonfungiblePositionManager();
         pool = new MockUniswapV3Pool();
-        positionInfo = new UniswapV3PositionInfo(address(positionManager));
+        factory = new MockUniswapV3Factory(address(pool));
+        positionInfo = new UniswapV3PositionInfo(address(positionManager), address(factory));
 
         // Set up mock position
         // https://etherscan.io/tx/0x89d75075eaef8c21ab215ae54144ba563b850ee7460f89b2a175fd0e267ed330#eventlog
@@ -46,7 +49,7 @@ contract UniswapV3PositionInfoTest is Test {
         uint256 tokenId = 1; // Example NFT token ID
 
         // Call the function and assert results
-        (uint256 amount0, uint256 amount1,,) = positionInfo.getPositionAmounts(tokenId, address(pool));
+        (uint256 amount0, uint256 amount1,,) = positionInfo.getPositionAmounts(tokenId);
 
         // Assert the expected amounts (replace these with expected values)
         assertEq(amount0, 0); // Example expected amount for token0

@@ -5,6 +5,7 @@ pragma abicoder v2;
 import "v3-core/contracts/libraries/TickMath.sol";
 import "v3-core/contracts/libraries/FullMath.sol";
 import "v3-core/contracts/libraries/SqrtPriceMath.sol";
+import "v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "./INonfungiblePositionManager.sol";
 import "./IUniswapV3Pool.sol";
 
@@ -12,15 +13,17 @@ import "./IUniswapV3Pool.sol";
 contract UniswapV3PositionInfo {
 
     INonfungiblePositionManager public positionManager;
+    IUniswapV3Factory public factory;
 
-    constructor(address _positionManager) {
+    constructor(address _positionManager, address _factory) {
         positionManager = INonfungiblePositionManager(_positionManager);
+        factory = IUniswapV3Factory(_factory);
     }
 
     // Square root of 1.0001 as a Q64.96
     uint160 private constant sqrtPricePrecision = 79228162514264337593543950336;
 
-    function getPositionAmounts(uint256 tokenId, address poolAddress) 
+    function getPositionAmounts(uint256 tokenId) 
         external 
         view 
         returns (uint256 amount0, uint256 amount1, address token0, address token1)
@@ -28,6 +31,8 @@ contract UniswapV3PositionInfo {
         INonfungiblePositionManager.Position memory position = positionManager.positions(tokenId);
         token0 = position.token0;
         token1 = position.token1;
+
+        address poolAddress = factory.getPool(token0, token1, position.fee);
 
         IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
 

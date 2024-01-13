@@ -6,7 +6,7 @@ import "../test/contracts/DummyERC20.sol";
 import "../contracts/PositionValue.sol";
 import "../contracts/UniswapV3PositionFacilitator.sol";
 
-// POSITION_INFO=0xb8281A5498384ccA369731f47b9D7D54f4A164E3 forge script script/UniswapV3PositionFacilitator.s.sol:Deploy --rpc-url https://rpc.ankr.com/eth_sepolia --broadcast --verify -vvvv
+// POSITION_INFO=0xab61cBa43778C01Cc60128C857A7e081EF6F6b65 forge script script/UniswapV3PositionFacilitator.s.sol:Deploy --rpc-url https://rpc.ankr.com/eth_sepolia --broadcast --verify -vvvv
 contract Deploy is Script {
     function setUp() public {}
 
@@ -36,6 +36,20 @@ contract Deploy is Script {
           "GHO/USDC LP leveraged",
           "GHO/USDC LP leveraged"
         );
+
+        vm.stopBroadcast();
+    }
+}
+
+contract Test is Script {
+    function setUp() public {}
+
+    function run() public {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        UniswapV3PositionFacilitator facilitator = UniswapV3PositionFacilitator(0x47830b5Ee4a5472210400fB1811C3396fDAAf381);
+        facilitator.wrapAndMintGho(7212, 1e18);
 
         vm.stopBroadcast();
     }
