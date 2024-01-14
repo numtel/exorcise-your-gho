@@ -4,6 +4,8 @@ import { WagmiConfig, createConfig, configureChains } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { publicProvider } from 'wagmi/providers/public';
 
+import { GlobalData } from '../components/GlobalData.js';
+
 import '@/styles/globals.css';
 
 const { publicClient, chains } = configureChains(
@@ -27,7 +29,9 @@ export default function App({ Component, pageProps }) {
         "--ck-font-family": 'Inter, sans-serif',
       }}
     >
-      <Component {...pageProps} />
+      <GlobalData>
+        <Component {...pageProps} />
+      </GlobalData>
     </ConnectKitProvider>
   </WagmiConfig>;
 }

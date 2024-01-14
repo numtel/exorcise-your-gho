@@ -14,7 +14,7 @@ export default function Transaction({writeArgs, submitText}) {
     hash: data ? data.hash : null,
   });
 
-  const shouldSwitchChain = chain && Number(writeArgs.chain) !== chain.id;
+  const shouldSwitchChain = chain && Number(writeArgs.chainId) !== chain.id;
   return (<div>
     {isLoading && <p className="form-status">Waiting for user confirmation...</p>}
     {isError && <p className="form-status error">Transaction error!</p>}

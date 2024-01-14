@@ -1,6 +1,59 @@
+import { useState, useContext } from 'react';
+import { useContractReads } from 'wagmi';
+import { isAddressEqual } from 'viem';
 
-export default function MintGho({ id, positionValue, ghoMinted }) {
+import { chainContracts } from '../contracts.js';
+import { GlobalContext } from './GlobalData.js';
+import Transaction from './Transaction.js';
+
+export default function MintGho({
+  id,
+  positionValue,
+  ghoMinted,
+  alreadyWrapped,
+}) {
+  const [ global, setGlobal ] = useContext(GlobalContext);
+  const [ mintAmount, setMintAmount ] = useState('0');
+  const chain = chainContracts();
+  const maxAmount = global.basis ? positionValue * global.maxLTV / global.basis : null;
+
+  const { data, isError, isLoading } = useContractReads({
+    contracts: [
+      {
+        ...chain.NonfungiblePositionManager,
+        functionName: 'getApproved',
+        args: [ id ],
+      },
+    ],
+  });
+
   return (<>
-    <p>Foo</p>
+    <label>
+      <span>Mint Amount</span>
+      <input
+        type="number"
+        min="0"
+        max={global.basis ? String(maxAmount) : 0}
+        step="1"
+        value={mintAmount}
+        onChange={(e) => setMintAmount(e.target.value)}
+        />
+    </label>
+    <p className="field-help">{global.basis ? <>Max {String(maxAmount)}</> : global.basis === false ? <>Error, try refreshing!</> : <>Loading...</>}</p>
+    {isLoading ? <p>Loading status...</p> :
+      isError ? <p>Error loading status.</p> :
+      data && isAddressEqual(data[0].result, chain.UniswapV3PositionFacilitator.address) ?
+        <Transaction submitText="Wrap and Mint GHO" writeArgs={{
+          ...chain.UniswapV3PositionFacilitator,
+          functionName: 'wrapAndMintGho',
+          args: [ id, BigInt(mintAmount) * (10n ** chain.ghoDecimals) ],
+        }} /> :
+      data ?
+        <Transaction submitText="Approve Wrap" writeArgs={{
+          ...chain.NonfungiblePositionManager,
+          functionName: 'approve',
+          args: [ chain.UniswapV3PositionFacilitator.address, id ],
+        }} /> :
+      <p>Unknown error! Refresh.</p>}
   </>);
 }
