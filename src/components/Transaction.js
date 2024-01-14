@@ -1,6 +1,6 @@
 import { useAccount, useNetwork, useSwitchNetwork, useContractWrite, useWaitForTransaction } from 'wagmi';
 
-export default function Transaction({writeArgs, submitText}) {
+export default function Transaction({writeArgs, submitText, disabled}) {
   const { address: account } = useAccount();
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
@@ -24,8 +24,8 @@ export default function Transaction({writeArgs, submitText}) {
       : txSuccess ? (<p className="form-status">Success!</p>)
       : (<p className="form-status">Transaction sent...</p>))}
     {shouldSwitchChain ?
-      <button type="button" disabled={!account} onClick={() => switchNetwork(writeArgs.chain)}>Switch Chain</button>
-      : <button type="button" disabled={!account || isLoading || txLoading} onClick={() => write()}>{submitText}</button>}
+      <button type="button" disabled={disabled || !account} onClick={() => switchNetwork(writeArgs.chain)}>Switch Chain</button>
+      : <button type="button" disabled={disabled || !account || isLoading || txLoading} onClick={() => write()}>{submitText}</button>}
   </div>);
 }
 

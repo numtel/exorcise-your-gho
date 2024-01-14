@@ -24,6 +24,7 @@ export default function ListPositions() {
         args: [ account ],
       },
     ],
+    watch: true,
   });
 
   const addButtons = [];
@@ -51,20 +52,20 @@ export default function ListPositions() {
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
     {data && <>
-      {/*<LoadByIndex {...{account}}
-        contract={contracts.UniswapV3PositionFacilitator}
+      <LoadByIndex {...{account}}
+        contract={chain.UniswapV3PositionFacilitator}
         count={data[0].result}
-        next={LoadWrappedById} />*/}
+        isWrapped={true} />
       <LoadByIndex {...{account}}
         contract={chain.NonfungiblePositionManager}
         count={data[1].result}
-        next={LoadUnwrappedById} />
+        isWrapped={false} />
     </>}
 
   </>);
 }
 
-function LoadByIndex({ contract, count, account, next }) {
+function LoadByIndex({ contract, count, account, isWrapped }) {
   const contracts = [];
   for(let i = 0; i < count; i++) {
     contracts.push({
@@ -78,13 +79,11 @@ function LoadByIndex({ contract, count, account, next }) {
   return (<>
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
-    {data && <>
-      {next({...{account}, ids: data.map(x => x.result)})}
-    </>}
+    {data && <LoadById {...{account, isWrapped}} ids={data.map(x => x.result)} />}
   </>);
 }
 
-function LoadUnwrappedById({ ids, account }) {
+function LoadById({ ids, account, isWrapped }) {
   const chain = chainContracts();
   const contracts = [];
   for(let i = 0; i < ids.length; i++) {
@@ -100,16 +99,20 @@ function LoadUnwrappedById({ ids, account }) {
   return (<>
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
-    {data && (<ul className="positions unwrapped">
+    {data && (<ul className={'positions ' + (isWrapped ? 'wrapped' : 'unwrapped')}>
       {data.map((positionResult, index) => {
         if(poolAllowed(positionResult.result, chain))
-          return <LoadSingleUnwrapped key={ids[index]} id={ids[index]} position={positionResult.result} />;
+          return <LoadSingle
+            key={ids[index]}
+            id={ids[index]}
+            position={positionResult.result}
+            {...{isWrapped}} />;
       })}
     </ul>)}
   </>);
 }
 
-function LoadSingleUnwrapped({ id, position }) {
+function LoadSingle({ id, position, isWrapped }) {
   const chain = chainContracts();
   const contracts = [
     {
@@ -128,12 +131,15 @@ function LoadSingleUnwrapped({ id, position }) {
       args: [ id ],
     },
   ];
-  const { data, isError, isLoading } = useContractReads({ contracts });
+  const { data, isError, isLoading } = useContractReads({
+    contracts,
+    watch: true,
+  });
 
   return (<li key={id}>
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
-    {data && <RenderPosition {...{id, position}}
+    {data && <RenderPosition {...{id, position, isWrapped}}
       tokenURI={data[0].result}
       positionValue={data[1].result}
       ghoMinted={data[2].result}

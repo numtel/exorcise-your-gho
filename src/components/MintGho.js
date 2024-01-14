@@ -10,12 +10,13 @@ export default function MintGho({
   id,
   positionValue,
   ghoMinted,
-  alreadyWrapped,
+  isWrapped,
 }) {
-  const [ global, setGlobal ] = useContext(GlobalContext);
+  const [ global ] = useContext(GlobalContext);
   const [ mintAmount, setMintAmount ] = useState('0');
   const chain = chainContracts();
-  const maxAmount = global.basis ? positionValue * global.maxLTV / global.basis : null;
+  const ghoMintedHuman = ghoMinted / 10n ** chain.ghoDecimals;
+  const maxAmount = global.basis ? (positionValue * global.maxLTV / global.basis) - ghoMintedHuman : null;
 
   const { data, isError, isLoading } = useContractReads({
     contracts: [
@@ -25,6 +26,7 @@ export default function MintGho({
         args: [ id ],
       },
     ],
+    watch: true,
   });
 
   return (<>
@@ -42,6 +44,14 @@ export default function MintGho({
     <p className="field-help">{global.basis ? <>Max {String(maxAmount)}</> : global.basis === false ? <>Error, try refreshing!</> : <>Loading...</>}</p>
     {isLoading ? <p>Loading status...</p> :
       isError ? <p>Error loading status.</p> :
+      isWrapped ?
+        <Transaction submitText="Mint GHO"
+          disabled={maxAmount < 1}
+          writeArgs={{
+            ...chain.UniswapV3PositionFacilitator,
+            functionName: 'mintGho',
+            args: [ id, BigInt(mintAmount) * (10n ** chain.ghoDecimals) ],
+          }} /> :
       data && isAddressEqual(data[0].result, chain.UniswapV3PositionFacilitator.address) ?
         <Transaction submitText="Wrap and Mint GHO" writeArgs={{
           ...chain.UniswapV3PositionFacilitator,

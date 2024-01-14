@@ -18,6 +18,7 @@ body {
   color: #000;
   --my-color: #000;
   --my-shaded-bg: #0001;
+  --my-highlight-bg: #fff7;
   --my-bg-color: #f6f7f9;
   --my-hover-color: #f0f2f5;
   --my-active-color: #eaecf2;
@@ -56,6 +57,16 @@ main {
   margin: 0 auto;
 }
 
+main>p {
+  margin: 15px 0;
+}
+main>p>a {
+  text-decoration:underline;
+}
+main>p>a>svg {
+  transform: scale(0.6);
+}
+
 .connectkit {
   position: absolute;
   top: 5px;
@@ -68,6 +79,7 @@ h1.logo {
   background-position: center 0;
   background-size: contain;
   padding:300px 0 0 0;
+  margin-bottom: 60px;
   text-align:center;
 }
 
@@ -76,7 +88,7 @@ h1,h2,h3,h4 {
 }
 
 h2 {
-  margin: 20px 0;
+  margin: 60px 0 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--my-border-color);
   line-height: 45px;
@@ -99,6 +111,10 @@ ul.positions li {
   border-radius: 16px;
   overflow: hidden;
   background: var(--my-shaded-bg);
+}
+
+ul.positions.wrapped li {
+  background: var(--my-highlight-bg);
 }
 
 .not-connected {
@@ -139,6 +155,7 @@ ul.positions .values .captions {
     color: #fff;
     --my-color: #fff;
     --my-shaded-bg: #fff1;
+    --my-highlight-bg: #0007;
     --my-bg-color: #383838;
     --my-hover-color: #404040;
     --my-active-color: #4d4d4d;

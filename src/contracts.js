@@ -18,7 +18,7 @@ export const byChain = {
        'GHO/USDC'],
     ],
     UniswapV3PositionFacilitator: {
-      address: '0x05d816d46cf7a39600648ca040e94678b8342277',
+      address: '0x2906214f991ddf913d542017fb9d1e362aa0b75d',
       abi: UniswapV3PositionFacilitatorABI,
       chainId: 11155111,
     },
