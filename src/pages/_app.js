@@ -22,7 +22,11 @@ const config = createConfig(
 
 export default function App({ Component, pageProps }) {
   return <WagmiConfig config={config}>
-    <ConnectKitProvider>
+    <ConnectKitProvider
+      customTheme={{
+        "--ck-font-family": 'Inter, sans-serif',
+      }}
+    >
       <Component {...pageProps} />
     </ConnectKitProvider>
   </WagmiConfig>;

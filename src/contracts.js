@@ -8,10 +8,13 @@ export const byChain = {
     chain: 11155111,
     name: 'Sepolia',
     explorer: 'https://sepolia.etherscan.io/',
+    poolManager: 'https://app.uniswap.org/pools/XXX?chain=sepolia',
+    addLiquidity: 'https://app.uniswap.org/add/',
     nativeCurrency: 'sETH',
     allowedPools: [
       ['0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8',
-       '0xc4bF5CbDaBE595361438F8c6a187bDc330539c60'],
+       '0xc4bF5CbDaBE595361438F8c6a187bDc330539c60',
+       'GHO/USDC'],
     ],
     UniswapV3PositionFacilitator: {
       address: '0x05d816d46cf7a39600648ca040e94678b8342277',

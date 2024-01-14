@@ -1,3 +1,7 @@
+@font-face { font-family: Inter; font-weight: 400; src: url(Inter-Regular.ttf); }
+@font-face { font-family: Inter; font-weight: 500; src: url(Inter-SemiBold.ttf); }
+@font-face { font-family: SignikaNegative; font-weight: 400; src: url(SignikaNegative-Regular.ttf); }
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -6,18 +10,56 @@
 
 html,
 body {
-  margin: 0;
   max-width: 100vw;
 }
 
 body {
   background: #ffe5ce;
   color: #000;
+  --my-color: #000;
+  --my-shaded-bg: #0001;
+  --my-bg-color: #f6f7f9;
+  --my-hover-color: #f0f2f5;
+  --my-active-color: #eaecf2;
+  --my-border-color: #0002;
+  font-family: Inter;
+  position:relative;
+  padding: 40px 0;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  color: var(--my-color));
+  background: var(--my-bg-color);
+  border-radius: 16px;
+  border: 0;
+  padding: 0 12px;
+  line-height: 40px;
+  font-weight: bold;
+  font-family: Inter, sans-serif;
+  margin: 5px;
+}
+button:hover {
+  background: var(--my-hover-color);
+}
+button:active {
+  background: var(--my-active-color);
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.connectkit {
+  position: absolute;
+  top: 5px;
+  right: 5px;
 }
 
 h1.logo {
@@ -29,6 +71,64 @@ h1.logo {
   text-align:center;
 }
 
+h1,h2,h3,h4 {
+  font-family: SignikaNegative;
+}
+
+h2 {
+  margin: 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--my-border-color);
+  line-height: 45px;
+  text-indent: 10px;
+}
+
+.header-buttons {
+  float:right;
+}
+
+ul.positions {
+}
+
+.not-connected,
+ul.positions li {
+  list-style:none;
+  display:flex;
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--my-shaded-bg);
+}
+
+.not-connected {
+  padding: 60px 16px;
+  justify-content: space-around;
+}
+
+ul.positions img {
+  max-height:180px;
+}
+
+ul.positions .values {
+  padding-left:10px;
+}
+
+ul.positions meter {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+ul.positions .values .captions {
+  display: flex;
+  justify-content:space-between;
+}
+@media (max-width:550px) {
+  ul.positions .values .captions {
+    flex-direction:column;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
@@ -37,9 +137,38 @@ h1.logo {
   body {
     background: #001a31;
     color: #fff;
+    --my-color: #fff;
+    --my-shaded-bg: #fff1;
+    --my-bg-color: #383838;
+    --my-hover-color: #404040;
+    --my-active-color: #4d4d4d;
+    --my-border-color: #fff2;
   }
 
   h1.logo {
     background-image: url(logo-dark.png);
   }
 }
+
+.slider {
+  width: 100%;
+  position: relative;
+  left: -100%;
+  opacity: 0;
+  transition: left 0.3s ease, opacity 0.5s ease;
+}
+
+.slider.active {
+  left: 0;
+  opacity: 1;
+}
+
+.shimmer {
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.shimmer:hover {
+  transform: rotateY(15deg) rotateX(15deg);
+}
+

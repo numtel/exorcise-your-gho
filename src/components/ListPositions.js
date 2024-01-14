@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useContractReads, useAccount, erc721ABI } from 'wagmi';
 import { isAddressEqual } from 'viem';
+import { ConnectKitButton } from 'connectkit';
 
 import { chainContracts } from '../contracts.js';
+import SlideIn from './SlideIn.js';
 
 export default function ListPositions() {
   const { address: account } = useAccount();
@@ -23,7 +25,25 @@ export default function ListPositions() {
     ],
   });
 
+  const addButtons = [];
+  for(let pool of chain.allowedPools) {
+    addButtons.push(
+      <a key={pool[0]+pool[1]} href={chain.addLiquidity + pool[0] + '/' + pool[1]} rel="noopener" target="_blank">
+        <button type="button">Add {pool[2]}</button>
+      </a>
+    );
+  }
+
   return (<>
+    <h2>
+      <div className="header-buttons">
+        {addButtons}
+      </div>
+      Positions
+    </h2>
+    {!account && <div className="not-connected">
+      <ConnectKitButton />
+    </div>}
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
     {data && <>
@@ -79,7 +99,7 @@ function LoadUnwrappedById({ ids, account }) {
     {data && (<ul className="positions unwrapped">
       {data.map((positionResult, index) => {
         if(poolAllowed(positionResult.result, chain))
-          return <LoadSingleUnwrapped id={ids[index]} position={positionResult.result} />;
+          return <LoadSingleUnwrapped key={ids[index]} id={ids[index]} position={positionResult.result} />;
       })}
     </ul>)}
   </>);
@@ -100,7 +120,6 @@ function LoadSingleUnwrapped({ id, position }) {
     },
   ];
   const { data, isError, isLoading } = useContractReads({ contracts });
-  console.log(data);
 
   return (<li key={id}>
     {isLoading && <p className="status loading">Loading...</p>}
@@ -113,10 +132,24 @@ function LoadSingleUnwrapped({ id, position }) {
 }
 
 function RenderUnwrapped({ id, tokenURI, position, positionValue }) {
+  const chain = chainContracts();
+  const tokenData = JSON.parse(atob(tokenURI.slice('data:application/json;base64,'.length)));
   return (<>
-    <p>ID: {String(id)}</p>
-    <p>Value: {formatAsDollars(positionValue)}</p>
-    <meter min="0" max={String(positionValue)} value="0">0/{String(positionValue)} minted</meter>
+    <a href={chain.poolManager.replace('XXX', String(id))} rel="noopener" target="_blank"
+        title="View Position Details on Uniswap">
+      <SlideIn>
+        <img className="shimmer" src={tokenData.image} alt="Position Graphical Representation" />
+      </SlideIn>
+    </a>
+    <SlideIn>
+      <div className="values">
+        <meter min="0" max={String(positionValue)} value="0">0/{String(positionValue)} minted</meter>
+        <div className="captions">
+          <p>Worth {formatAsDollars(positionValue)}</p>
+          <p>0 GHO Minted (0% LTV)</p>
+        </div>
+      </div>
+    </SlideIn>
   </>);
 }
 
