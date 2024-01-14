@@ -13,6 +13,7 @@ import "./IPositionValue.sol";
 import "./IUniswapV3PositionInfo.sol";
 
 contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Receiver, IERC4906, IGhoFacilitator {
+  error ONLY_GHO_POSITIONS();
   error MINTS_PAUSED();
   error LIQUIDATIONS_PAUSED();
   error ONLY_POSITION_OWNER();
@@ -56,13 +57,16 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
   }
 
   function positionValue(uint256 tokenId) public view returns(uint256) {
+    // The following is commented out because this testnet version
+    // facilitates a fake GHO token, not the real testnet one.
+    // if(token0 != address(GHO_TOKEN) || token1 != address(GHO_TOKEN))
+    //   revert ONLY_GHO_POSITIONS;
     (uint256 amount0, uint256 amount1, address token0, address token1) = positionInfo.getPositionAmounts(tokenId);
     (uint256 usd, uint8 decimals) = valuer.toUSD(amount0, amount1, token0, token1);
 
     return usd / (10 ** uint(decimals));
   }
 
-  // TODO restrict to positions in specified pools
   function wrapAndMintGho(uint256 tokenId, uint256 mintAmount) external {
     IERC721(positionInfo.positionManager()).safeTransferFrom(msg.sender, address(this), tokenId);
     _mint(msg.sender, tokenId);
@@ -91,6 +95,7 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
       revert REPAY_UNDERFLOW();
     GHO_TOKEN.transferFrom(msg.sender, address(this), repayAmount);
     GHO_TOKEN.burn(repayAmount);
+    ghoMintedByTokenId[tokenId] -= repayAmount;
     emit GhoRepaid(tokenId, repayAmount);
   }
 
@@ -127,7 +132,7 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
       return IERC721Receiver.onERC721Received.selector;
   }
 
-  // TODO implement a fee
+  // TODO implement a fee? or, liquidity providers could get extra rewards?
   function distributeFeesToTreasury() external override {
     uint256 balance = GHO_TOKEN.balanceOf(address(this));
     GHO_TOKEN.transfer(_ghoTreasury, balance);

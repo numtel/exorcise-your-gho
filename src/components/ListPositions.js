@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { useContractReads, useAccount, erc721ABI } from 'wagmi';
+import { useContractReads, useAccount } from 'wagmi';
 import { isAddressEqual } from 'viem';
 import { ConnectKitButton } from 'connectkit';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 
 import { chainContracts } from '../contracts.js';
-import SlideIn from './SlideIn.js';
+import RenderPosition from './RenderPosition.js';
 
 export default function ListPositions() {
   const { address: account } = useAccount();
@@ -29,7 +30,10 @@ export default function ListPositions() {
   for(let pool of chain.allowedPools) {
     addButtons.push(
       <a key={pool[0]+pool[1]} href={chain.addLiquidity + pool[0] + '/' + pool[1]} rel="noopener" target="_blank">
-        <button type="button">Add {pool[2]}</button>
+        <button type="button">
+          Add {pool[2]}&nbsp;
+          <FontAwesomeIcon icon={faUpRightFromSquare} />
+        </button>
       </a>
     );
   }
@@ -118,39 +122,23 @@ function LoadSingleUnwrapped({ id, position }) {
       functionName: 'positionValue',
       args: [ id ],
     },
+    {
+      ...chain.UniswapV3PositionFacilitator,
+      functionName: 'ghoMintedByTokenId',
+      args: [ id ],
+    },
   ];
   const { data, isError, isLoading } = useContractReads({ contracts });
 
   return (<li key={id}>
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
-    {data && <RenderUnwrapped {...{id, position}}
+    {data && <RenderPosition {...{id, position}}
       tokenURI={data[0].result}
       positionValue={data[1].result}
+      ghoMinted={data[2].result}
     />}
   </li>);
-}
-
-function RenderUnwrapped({ id, tokenURI, position, positionValue }) {
-  const chain = chainContracts();
-  const tokenData = JSON.parse(atob(tokenURI.slice('data:application/json;base64,'.length)));
-  return (<>
-    <a href={chain.poolManager.replace('XXX', String(id))} rel="noopener" target="_blank"
-        title="View Position Details on Uniswap">
-      <SlideIn>
-        <img className="shimmer" src={tokenData.image} alt="Position Graphical Representation" />
-      </SlideIn>
-    </a>
-    <SlideIn>
-      <div className="values">
-        <meter min="0" max={String(positionValue)} value="0">0/{String(positionValue)} minted</meter>
-        <div className="captions">
-          <p>Worth {formatAsDollars(positionValue)}</p>
-          <p>0 GHO Minted (0% LTV)</p>
-        </div>
-      </div>
-    </SlideIn>
-  </>);
 }
 
 function poolAllowed(position, chain) {
@@ -161,12 +149,3 @@ function poolAllowed(position, chain) {
   return false;
 }
 
-// Thanks ChatGPT4
-function formatAsDollars(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    }).format(amount);
-}

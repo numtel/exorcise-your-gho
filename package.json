@@ -11,6 +11,9 @@
     "deploy:facilitator": "POSITION_INFO=0xab61cBa43778C01Cc60128C857A7e081EF6F6b65 forge script script/UniswapV3PositionFacilitator.s.sol:Deploy --rpc-url https://rpc.ankr.com/eth_sepolia --broadcast --verify -vvvv"
   },
   "dependencies": {
+    "@fortawesome/free-brands-svg-icons": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "connectkit": "^1.6.0",
     "next": "14.0.4",
     "react": "^18",

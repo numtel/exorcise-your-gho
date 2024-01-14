@@ -1,5 +1,7 @@
 import Head from 'next/head';
 import { ConnectKitButton } from 'connectkit';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGithub, faEthereum } from '@fortawesome/free-brands-svg-icons';
 
 import ListPositions from '../components/ListPositions.js';
 
@@ -22,6 +24,14 @@ export default function Home() {
         </div>
         <h1 className="logo">Exorcise Your GHO</h1>
         <ListPositions />
+        <footer>
+          <a href="https://github.com/numtel/exorcise-your-gho" rel="noopener" target="_blank" title="Github Repository">
+            <FontAwesomeIcon icon={faGithub} size="2xl" />
+          </a>&nbsp;
+          <a href="https://ethglobal.com/events/lfgho/home" rel="noopener" target="_blank" title="LFGHO Hackathon">
+            <FontAwesomeIcon icon={faEthereum} size="2xl" />
+          </a>
+        </footer>
       </main>
     </>
   )
