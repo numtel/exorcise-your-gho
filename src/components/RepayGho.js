@@ -83,7 +83,7 @@ export default function RepayGho({
             chain.UniswapV3PositionFacilitator.address,
             ghoMinted,
           ],
-        }} /> : <Transaction submitText={ghoMinted > 0 ? "Repay full balance and Unwrap" : "Unwrap"} writeArgs={{
+        }} /> : <Transaction submitText={ghoMinted > 0 ? "Repay Full and Unwrap" : "Unwrap"} writeArgs={{
           ...chain.UniswapV3PositionFacilitator,
           functionName: 'repayGhoAndUnwrap',
           args: [ id ],

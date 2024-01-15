@@ -156,6 +156,14 @@ ul.positions .values .captions {
   border-radius: 16px;
   border: 1px solid var(--my-border-color);
 }
+@media (max-width:650px) {
+  .actions {
+    flex-direction: column;
+  }
+  .action {
+    width: 100%;
+  }
+}
 .action label {
   display:block;
 }
