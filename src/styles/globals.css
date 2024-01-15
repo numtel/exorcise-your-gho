@@ -113,7 +113,6 @@ ul.positions li {
   background: var(--my-shaded-bg);
 }
 
-
 ul.positions.wrapped li {
   background: var(--my-highlight-bg);
 }
@@ -144,6 +143,31 @@ ul.positions .values .captions {
   ul.positions .values .captions {
     flex-direction:column;
   }
+}
+
+.leaderboard-placeholder {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding: 100px 0;
+}
+button.load-more {
+  display: block;
+  margin: 40px auto;
+}
+ul.positions.liquidation {
+  text-align:center;
+}
+
+ul.positions.liquidation li {
+  display:inline-block;
+  text-align:center;
+}
+ul.positions.liquidation img {
+  max-height:150px;
+}
+ul.positions.liquidation .values .captions {
+  flex-direction:column;
 }
 
 .actions {
@@ -184,6 +208,7 @@ ul.positions .values .captions {
   line-height: 40px;
   text-align:right;
 }
+ul.positions.liquidation button,
 .action button {
   width: 100%;
   text-align: center;

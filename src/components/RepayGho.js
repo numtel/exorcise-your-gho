@@ -1,9 +1,8 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 
 import { useAccount, useContractReads, erc20ABI } from 'wagmi';
 
 import { chainContracts } from '../contracts.js';
-import { GlobalContext } from './GlobalData.js';
 import Transaction from './Transaction.js';
 
 export default function RepayGho({
@@ -34,6 +33,8 @@ export default function RepayGho({
     watch: true,
   });
 
+  if(data && data[0].status === 'failure')
+    return (<p className="form-status error">Error loading details!</p>);
   const ghoMintedHuman = ghoMinted / 10n ** chain.ghoDecimals;
   const balance = data ? data[0].result / 10n ** chain.ghoDecimals : 0;
   const maxAmount = ghoMinted > balance ? ghoMintedHuman : balance;

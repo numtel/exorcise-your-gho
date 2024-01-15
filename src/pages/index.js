@@ -5,6 +5,7 @@ import { faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faEthereum } from '@fortawesome/free-brands-svg-icons';
 
 import ListPositions from '../components/ListPositions.js';
+import Leaderboard from '../components/Leaderboard.js';
 
 /*
  * List my position manager nfts + my wrapped position nfts
@@ -31,6 +32,7 @@ export default function Home() {
           <FontAwesomeIcon icon={faUpRightFromSquare} />
         </a> for USDC faucet and GHO minting</p>
         <ListPositions />
+        <Leaderboard />
         <footer>
           <a href="https://github.com/numtel/exorcise-your-gho" rel="noopener" target="_blank" title="Github Repository">
             <FontAwesomeIcon icon={faGithub} size="2xl" />

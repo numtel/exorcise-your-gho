@@ -79,11 +79,11 @@ function LoadByIndex({ contract, count, account, isWrapped }) {
   return (<>
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
-    {data && <LoadById {...{account, isWrapped}} ids={data.map(x => x.result)} />}
+    {data && <LoadById {...{isWrapped}} ids={data.map(x => x.result)} />}
   </>);
 }
 
-function LoadById({ ids, account, isWrapped }) {
+export function LoadById({ ids, isWrapped }) {
   const chain = chainContracts();
   const contracts = [];
   for(let i = 0; i < ids.length; i++) {
@@ -99,7 +99,7 @@ function LoadById({ ids, account, isWrapped }) {
   return (<>
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
-    {data && (<ul className={'positions ' + (isWrapped ? 'wrapped' : 'unwrapped')}>
+    {data && (<ul className={'positions ' + (isWrapped === 'liquidation' ? isWrapped : isWrapped ? 'wrapped' : 'unwrapped')}>
       {data.map((positionResult, index) => {
         if(poolAllowed(positionResult.result, chain))
           return <LoadSingle

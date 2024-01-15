@@ -7,6 +7,7 @@ import { GlobalContext } from './GlobalData.js';
 import SlideIn from './SlideIn.js';
 import MintGho from './MintGho.js';
 import RepayGho from './RepayGho.js';
+import Liquidate from './Liquidate.js';
 
 export default function RenderPosition({
   id,
@@ -24,11 +25,12 @@ export default function RenderPosition({
   // 90% of max LTV
   const safeLtv = global.basis ? positionValue * global.maxLTV * 90n / (global.basis * 100n) : 0n;
   const liquidate = global.basis ? positionValue * global.liquidate / global.basis : 0n;
+  const isLiquidation = isWrapped === 'liquidation';
   return (<>
     <a href={chain.poolManager.replace('XXX', String(id))} rel="noopener" target="_blank"
         title="View Position Details on Uniswap">
       <SlideIn>
-        <img className="shimmer" src={tokenData.image} alt="Position Graphical Representation" />
+        <img className={'shimmer' + (isLiquidation ? ' liquidation' : '')} src={tokenData.image} alt="Position Graphical Representation" />
       </SlideIn>
     </a>
     <SlideIn>
@@ -52,12 +54,14 @@ export default function RenderPosition({
         </div>
 
         <div className="actions">
-          <div className="action">
-            <MintGho {...{id, positionValue, ghoMinted, isWrapped}} />
-          </div>
-          {isWrapped && <div className="action">
-            <RepayGho {...{id, positionValue, ghoMinted, isWrapped}} />
-          </div>}
+          {isLiquidation ? <Liquidate {...{id, positionValue, ghoMinted}} /> : <>
+            <div className="action">
+              <MintGho {...{id, positionValue, ghoMinted, isWrapped}} />
+            </div>
+            {isWrapped && <div className="action">
+              <RepayGho {...{id, positionValue, ghoMinted, isWrapped}} />
+            </div>}
+          </>}
         </div>
       </div>
     </SlideIn>
