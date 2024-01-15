@@ -58,7 +58,7 @@ main {
 }
 
 main>p {
-  margin: 15px 0;
+  margin: 15px;
 }
 main>p>a {
   text-decoration:underline;
@@ -107,7 +107,7 @@ ul.positions li {
   list-style:none;
   display:flex;
   padding: 16px;
-  margin: 16px 0;
+  margin: 16px 5px;
   border-radius: 16px;
   overflow: hidden;
   background: var(--my-shaded-bg);

@@ -10,6 +10,8 @@ Free your GHO when you provide liquidity to support the token! This project is a
 
 Inspired by Defrost Finance on Avalanche (now defunct, but it was sweet while Avalanche Rush was going on) and the Aave v2 Ethereum AMM market. (also now defunct)
 
+[View project on ETHGlobal Showcase...](https://ethglobal.com/showcase/exorcise-your-gho-0aawf)
+
 ## Installation
 
 > Requires Node.js and Foundry installed
