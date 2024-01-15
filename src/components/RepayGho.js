@@ -53,7 +53,14 @@ export default function RepayGho({
         onChange={(e) => setRepayAmount(e.target.value)}
         />
     </label>
-    <p className="field-help">{data ? <>Balance: {String(balance)} GHO</> : isError  ? <>Error loading balance</> : <>Loading balace...</>}</p>
+    <p className="field-help">{data ? <>
+      Balance:&nbsp;
+      <a href="#" onClick={(e) => {
+        e.preventDefault();
+        setRepayAmount(String(maxAmount));
+      }}>
+        {String(balance)} GHO
+      </a></> : isError  ? <>Error loading balance</> : <>Loading balace...</>}</p>
     {isLoading ? <p>Loading status...</p> :
       isError ? <p>Error loading status.</p> :
       <>{needsApproval ?
@@ -74,7 +81,7 @@ export default function RepayGho({
             args: [ id, BigInt(repayAmount) * (10n ** chain.ghoDecimals) ],
           }} />}
         {canUnwrap && (needsUnwrapApproval ?
-        <Transaction submitText="Approve full balance" writeArgs={{
+        <Transaction submitText="Approve Full to Unwrap" writeArgs={{
           address: chain.ghoToken,
           abi: erc20ABI,
           chainId: chain.chain,

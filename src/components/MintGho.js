@@ -16,7 +16,7 @@ export default function MintGho({
   const [ mintAmount, setMintAmount ] = useState('0');
   const chain = chainContracts();
   const ghoMintedHuman = ghoMinted / 10n ** chain.ghoDecimals;
-  const maxAmount = global.basis ? (positionValue * global.maxLTV / global.basis) - ghoMintedHuman : null;
+  const maxAmount = global.basis ? (positionValue * global.maxLTV / global.basis) - ghoMintedHuman : 0n;
 
   const { data, isError, isLoading } = useContractReads({
     contracts: [
@@ -35,13 +35,19 @@ export default function MintGho({
       <input
         type="number"
         min="0"
-        max={global.basis ? String(maxAmount) : 0}
+        max={String(maxAmount)}
         step="1"
         value={mintAmount}
         onChange={(e) => setMintAmount(e.target.value)}
         />
     </label>
-    <p className="field-help">{global.basis ? <>Max: {String(maxAmount)} GHO</> : global.basis === false ? <>Error, try refreshing!</> : <>Loading...</>}</p>
+    <p className="field-help">{global.basis ? <>Max:&nbsp;
+      <a href="#" onClick={(e) => {
+        e.preventDefault();
+        setMintAmount(String(maxAmount));
+      }}>
+        {String(maxAmount)} GHO
+      </a></> : global.basis === false ? <>Error, try refreshing!</> : <>Loading...</>}</p>
     {isLoading ? <p>Loading status...</p> :
       isError ? <p>Error loading status.</p> :
       isWrapped ?

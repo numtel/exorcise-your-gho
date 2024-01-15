@@ -53,7 +53,7 @@ button:active {
 }
 
 main {
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
@@ -113,6 +113,7 @@ ul.positions li {
   background: var(--my-shaded-bg);
 }
 
+
 ul.positions.wrapped li {
   background: var(--my-highlight-bg);
 }
@@ -123,7 +124,7 @@ ul.positions.wrapped li {
 }
 
 ul.positions img {
-  max-height:180px;
+  max-height:350px;
 }
 
 ul.positions .values {
@@ -157,8 +158,10 @@ ul.positions .values .captions {
   border: 1px solid var(--my-border-color);
 }
 @media (max-width:650px) {
+  ul.positions li,
   .actions {
     flex-direction: column;
+    align-items:center;
   }
   .action {
     width: 100%;
