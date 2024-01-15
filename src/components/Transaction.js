@@ -16,16 +16,16 @@ export default function Transaction({writeArgs, submitText, disabled}) {
 
   const shouldSwitchChain = chain && Number(writeArgs.chainId) !== chain.id;
   return (<div>
-    {isLoading && <p className="form-status">Waiting for user confirmation...</p>}
+    {shouldSwitchChain ?
+      <button type="button" disabled={disabled || !account} onClick={() => switchNetwork(writeArgs.chain)}>Switch Chain</button>
+      : <button type="button" disabled={disabled || !account || isLoading || txLoading} onClick={() => write()}>{submitText}</button>}
+    {isLoading && <p className="form-status">Waiting for user...</p>}
     {isError && <p className="form-status error">Transaction error!</p>}
     {isSuccess && (
       txError ? (<p className="form-status error">Transaction error!</p>)
       : txLoading ? (<p className="form-status">Waiting for transaction...</p>)
       : txSuccess ? (<p className="form-status">Success!</p>)
       : (<p className="form-status">Transaction sent...</p>))}
-    {shouldSwitchChain ?
-      <button type="button" disabled={disabled || !account} onClick={() => switchNetwork(writeArgs.chain)}>Switch Chain</button>
-      : <button type="button" disabled={disabled || !account || isLoading || txLoading} onClick={() => write()}>{submitText}</button>}
   </div>);
 }
 

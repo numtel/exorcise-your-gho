@@ -10,6 +10,7 @@ export const byChain = {
     explorer: 'https://sepolia.etherscan.io/',
     poolManager: 'https://app.uniswap.org/pools/XXX?chain=sepolia',
     addLiquidity: 'https://app.uniswap.org/add/',
+    ghoToken: '0x226df39850e183b2df941c954acd9a46bfe767eb',
     ghoDecimals: 18n,
     nativeCurrency: 'sETH',
     allowedPools: [

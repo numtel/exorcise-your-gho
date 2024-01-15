@@ -145,6 +145,52 @@ ul.positions .values .captions {
   }
 }
 
+.actions {
+  display: flex;
+}
+
+.action {
+  width: 50%;
+  padding: 15px;
+  margin: 10px;
+  border-radius: 16px;
+  border: 1px solid var(--my-border-color);
+}
+.action label {
+  display:block;
+}
+.action label span {
+  display:block;
+  padding: 8px;
+  font-weight: bold;
+}
+.action input {
+  border: 0;
+  border-radius: 16px;
+  width: 100%;
+  padding: 0 8px;
+  font-size: 120%;
+  line-height: 40px;
+  text-align:right;
+}
+.action button {
+  width: 100%;
+  text-align: center;
+}
+.field-help {
+  font-size: 90%;
+  text-align:right;
+  padding: 8px 24px 8px 0;
+}
+.form-status {
+  padding: 10px;
+  border: 1px solid var(--my-border-color);
+  background:var(--my-highlight-bg);
+  border-radius: 5px;
+  margin: 5px;
+  display:block;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

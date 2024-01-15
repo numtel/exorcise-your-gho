@@ -31,7 +31,7 @@ export default function MintGho({
 
   return (<>
     <label>
-      <span>Mint Amount</span>
+      <span>Mint</span>
       <input
         type="number"
         min="0"
@@ -41,12 +41,12 @@ export default function MintGho({
         onChange={(e) => setMintAmount(e.target.value)}
         />
     </label>
-    <p className="field-help">{global.basis ? <>Max {String(maxAmount)}</> : global.basis === false ? <>Error, try refreshing!</> : <>Loading...</>}</p>
+    <p className="field-help">{global.basis ? <>Max: {String(maxAmount)} GHO</> : global.basis === false ? <>Error, try refreshing!</> : <>Loading...</>}</p>
     {isLoading ? <p>Loading status...</p> :
       isError ? <p>Error loading status.</p> :
       isWrapped ?
         <Transaction submitText="Mint GHO"
-          disabled={maxAmount < 1}
+          disabled={mintAmount < 1}
           writeArgs={{
             ...chain.UniswapV3PositionFacilitator,
             functionName: 'mintGho',

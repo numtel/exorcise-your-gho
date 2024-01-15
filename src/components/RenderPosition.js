@@ -6,6 +6,7 @@ import { chainContracts } from '../contracts.js';
 import { GlobalContext } from './GlobalData.js';
 import SlideIn from './SlideIn.js';
 import MintGho from './MintGho.js';
+import RepayGho from './RepayGho.js';
 
 export default function RenderPosition({
   id,
@@ -41,19 +42,23 @@ export default function RenderPosition({
           value={String(ghoMintedHuman)}
         >{String(ghoMintedHuman)} GHO minted</meter>
         <div className="captions">
-          <p>Worth {formatAsDollars(positionValue)}</p>
-          <p>{String(ghoMintedHuman)} GHO Minted {ltv && <>({ltv}% LTV)</>}</p>
+          <p>
+            <a href={chain.poolManager.replace('XXX', String(id))} rel="noopener" target="_blank">
+              Worth {formatAsDollars(positionValue)}&nbsp;
+              <FontAwesomeIcon icon={faUpRightFromSquare} />
+            </a>
+          </p>
+          <p>{String(ghoMintedHuman)} GHO Minted {ltv ? <>({ltv}% LTV)</> : null}</p>
         </div>
 
         <div className="actions">
-          <MintGho {...{id, positionValue, ghoMinted, isWrapped}} />
+          <div className="action">
+            <MintGho {...{id, positionValue, ghoMinted, isWrapped}} />
+          </div>
+          {isWrapped && <div className="action">
+            <RepayGho {...{id, positionValue, ghoMinted, isWrapped}} />
+          </div>}
         </div>
-        <p>
-          <a href={chain.poolManager.replace('XXX', String(id))} rel="noopener" target="_blank">
-            Details on Uniswap&nbsp;
-            <FontAwesomeIcon icon={faUpRightFromSquare} />
-          </a>
-        </p>
       </div>
     </SlideIn>
   </>);
