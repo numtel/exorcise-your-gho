@@ -251,3 +251,7 @@ footer {
   display:flex;
   justify-content: center;
 }
+
+/* FA icons flash huge on page load? */
+.svg-inline--fa { max-height: 1rem; }
+footer .svg-inline--fa { max-height: 2rem; }
