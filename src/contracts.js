@@ -10,7 +10,7 @@ export const byChain = {
     explorer: 'https://sepolia.etherscan.io/',
     poolManager: 'https://app.uniswap.org/pools/XXX?chain=sepolia',
     addLiquidity: 'https://app.uniswap.org/add/',
-    ghoToken: '0x226df39850e183b2df941c954acd9a46bfe767eb',
+    ghoToken: '0xff32776Cef1DF58B781DbFDF419E8fC616e20498',
     ghoDecimals: 18n,
     nativeCurrency: 'sETH',
     allowedPools: [
@@ -19,7 +19,7 @@ export const byChain = {
        'GHO/USDC'],
     ],
     UniswapV3PositionFacilitator: {
-      address: '0x2906214f991ddf913d542017fb9d1e362aa0b75d',
+      address: '0xdF5306aE2b300Cd21197aE1Ac2A17912fF6C94a7',
       abi: UniswapV3PositionFacilitatorABI,
       chainId: 11155111,
     },

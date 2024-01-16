@@ -8,6 +8,7 @@ import SlideIn from './SlideIn.js';
 import MintGho from './MintGho.js';
 import RepayGho from './RepayGho.js';
 import Liquidate from './Liquidate.js';
+import CollectFees from './CollectFees.js';
 
 export default function RenderPosition({
   id,
@@ -48,7 +49,8 @@ export default function RenderPosition({
             <a href={chain.poolManager.replace('XXX', String(id))} rel="noopener" target="_blank">
               Worth {formatAsDollars(positionValue)}&nbsp;
               <FontAwesomeIcon icon={faUpRightFromSquare} />
-            </a>
+            </a>&nbsp;
+            {isWrapped === true && <CollectFees {...{id}} />}
           </p>
           <p>{String(ghoMintedHuman)} GHO Minted {ltv ? <>({ltv}% LTV)</> : null}</p>
         </div>

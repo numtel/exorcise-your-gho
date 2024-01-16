@@ -51,6 +51,14 @@ button:hover {
 button:active {
   background: var(--my-active-color);
 }
+button.outline {
+  background:none;
+  border: 1px solid var(--my-border-color);
+  border-radius: 5px;
+  line-height: 1.3rem;
+  margin: 0;
+  padding: 0 5px;
+}
 
 main {
   max-width: 960px;

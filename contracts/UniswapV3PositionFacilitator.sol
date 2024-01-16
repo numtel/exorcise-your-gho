@@ -119,6 +119,19 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
     emit TokenUnwrapped(tokenId, msg.sender);
   }
 
+  function collectFees(uint256 tokenId) external {
+    if(ownerOf(tokenId) != msg.sender)
+      revert ONLY_POSITION_OWNER();
+    INonfungiblePositionManager(positionInfo.positionManager()).collect(
+      INonfungiblePositionManager.CollectParams({
+        tokenId: tokenId,
+        recipient: msg.sender,
+        amount0Max: type(uint128).max,
+        amount1Max: type(uint128).max
+      })
+    );
+  }
+
   function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Enumerable, IERC165) returns (bool) {
     return interfaceId == bytes4(0x49064906) || super.supportsInterface(interfaceId);
   }
@@ -163,3 +176,16 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
     pauseLiquidations = _pauseLiquidations;
   }
 }
+
+// Uniswap repo uses Solidity 0.7.6, easier to include this here
+interface INonfungiblePositionManager {
+    struct CollectParams {
+        uint256 tokenId;
+        address recipient;
+        uint128 amount0Max;
+        uint128 amount1Max;
+    }
+
+    function collect(CollectParams calldata params) external payable returns (uint256 amount0, uint256 amount1);
+}
+
