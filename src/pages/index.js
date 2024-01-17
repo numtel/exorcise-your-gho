@@ -24,13 +24,12 @@ export default function Home() {
         <div className="connectkit">
           <ConnectKitButton />
         </div>
-        <h1 className="logo">Exorcise Your GHO</h1>
-        <p>Free your GHO when you provide liquidity to support the token!</p>
-        <p>Mint up to 90% of the value of your GHO liquidity positions. Liquidations happen at 95% but there's no fee so <em>*only*</em> risk is depeg.</p>
-        <p>Uses <a href="https://gho.aave.com" rel="noopener" target="_blank">
-          Aave GHO Sepolia Instance
+        <h1 className="logo"><span>Exorcise Your GHO</span></h1>
+        <p>Mint up to 90% of the value of your Uniswap GHO liquidity positions.</p>
+        <p>Use <a href="https://gho.aave.com" rel="noopener" target="_blank">
+          Aave Sepolia
           <FontAwesomeIcon icon={faUpRightFromSquare} />
-        </a> for USDC faucet and GHO minting</p>
+        </a> for USDC faucet and minting GHO.</p>
         <ListPositions />
         <Leaderboard />
         <footer>

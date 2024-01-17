@@ -51,7 +51,9 @@ export default function ListPositions() {
     </div>}
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
-    {data && <>
+    {data && data[0].result === 0n && data[1].result === 0n ? <div className="no-positions">
+      <p>To begin, add liquidity.</p>
+    </div> : data ? <>
       <LoadByIndex {...{account}}
         contract={chain.UniswapV3PositionFacilitator}
         count={data[0].result}
@@ -60,7 +62,7 @@ export default function ListPositions() {
         contract={chain.NonfungiblePositionManager}
         count={data[1].result}
         isWrapped={false} />
-    </>}
+    </> : null}
 
   </>);
 }

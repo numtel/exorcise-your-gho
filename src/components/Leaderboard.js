@@ -31,6 +31,7 @@ export default function Leaderbaord() {
     <h2>
       Liquidation Leaderboard
     </h2>
+    <p>Liquidations at 95% LTV</p>
     {isLoading && <p className="status loading">Loading...</p>}
     {isError && <p className="status error">Error Loading!</p>}
     {data && <Paging
