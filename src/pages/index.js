@@ -36,7 +36,7 @@ export default function Home() {
           <a href="https://github.com/numtel/exorcise-your-gho" rel="noopener" target="_blank" title="Github Repository">
             <FontAwesomeIcon icon={faGithub} size="2xl" />
           </a>&nbsp;
-          <a href="https://ethglobal.com/events/lfgho/home" rel="noopener" target="_blank" title="LFGHO Hackathon">
+          <a href="https://ethglobal.com/showcase/exorcise-your-gho-0aawf" rel="noopener" target="_blank" title="LFGHO Hackathon">
             <FontAwesomeIcon icon={faEthereum} size="2xl" />
           </a>
         </footer>
