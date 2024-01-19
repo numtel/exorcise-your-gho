@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-import { useAccount, useContractReads, erc20ABI } from 'wagmi';
+import { useAccount, useContractReads, useSignTypedData } from 'wagmi';
 
 import { chainContracts } from '../contracts.js';
+import erc20PermitABI from '../abi/ERC20Permit.json';
 import Transaction from './Transaction.js';
 
 export default function RepayGho({
@@ -17,17 +18,17 @@ export default function RepayGho({
     contracts: [
       {
         address: chain.ghoToken,
-        abi: erc20ABI,
+        abi: erc20PermitABI,
         chainId: chain.chain,
         functionName: 'balanceOf',
         args: [ account ],
       },
       {
         address: chain.ghoToken,
-        abi: erc20ABI,
+        abi: erc20PermitABI,
         chainId: chain.chain,
-        functionName: 'allowance',
-        args: [ account, chain.UniswapV3PositionFacilitator.address ],
+        functionName: 'nonces',
+        args: [ account ],
       },
     ],
     watch: true,
@@ -38,9 +39,58 @@ export default function RepayGho({
   const ghoMintedHuman = ghoMinted / 10n ** chain.ghoDecimals;
   const balance = data ? data[0].result / 10n ** chain.ghoDecimals : 0;
   const maxAmount = ghoMinted > balance ? ghoMintedHuman : balance;
-  const needsApproval = data ? data[1].result < repayAmount : true;
   const canUnwrap = balance >= ghoMintedHuman;
-  const needsUnwrapApproval = data ? data[1].result < ghoMinted : ghoMinted > 0;
+
+  const [ deadline, setDeadline ] = useState(
+    Math.floor(Date.now() / 1000) + (60 * 60 * 24)); // 24 hours from now
+
+  const {
+    data: signData,
+    isError: signError,
+    isLoading: signLoading,
+    isSuccess: signSuccess,
+    reset: resetSign,
+    signTypedData
+  } = useSignTypedData({
+    domain: {
+      version: '1',
+      name: chain.ghoTokenName,
+      chainId: chain.chain,
+      verifyingContract: chain.ghoToken,
+    },
+    message: {
+      owner: account,
+      spender: chain.UniswapV3PositionFacilitator.address,
+      value: ghoMinted,
+      nonce: data && data[1].result,
+      deadline,
+    },
+    primaryType: 'Permit',
+    types: {
+      Permit: [
+        {
+          name: 'owner',
+          type: 'address',
+        },
+        {
+          name: 'spender',
+          type: 'address',
+        },
+        {
+          name: 'value',
+          type: 'uint256',
+        },
+        {
+          name: 'nonce',
+          type: 'uint256',
+        },
+        {
+          name: 'deadline',
+          type: 'uint256',
+        },
+      ],
+    },
+  });
 
   return (<>
     <label>
@@ -64,38 +114,38 @@ export default function RepayGho({
       </a></> : isError  ? <>Error loading balance</> : <>Loading balace...</>}</p>
     {isLoading ? <p>Loading status...</p> :
       isError ? <p>Error loading status.</p> :
-      <>{needsApproval ?
-        <Transaction submitText="Approve GHO" writeArgs={{
-          address: chain.ghoToken,
-          abi: erc20ABI,
-          chainId: chain.chain,
-          functionName: 'approve',
-          args: [
-            chain.UniswapV3PositionFacilitator.address,
-            BigInt(repayAmount) * 10n ** chain.ghoDecimals,
-          ],
-        }} /> : <Transaction submitText="Repay GHO"
-          disabled={repayAmount < 1}
+      <><button disabled={signData} type="button" onClick={signTypedData}>
+          Sign Spend Permit
+        </button>
+        <Transaction
+          submitText="Repay GHO"
+          disabled={repayAmount < 1 || !signData}
           writeArgs={{
             ...chain.UniswapV3PositionFacilitator,
-            functionName: 'repayGho',
-            args: [ id, BigInt(repayAmount) * (10n ** chain.ghoDecimals) ],
-          }} />}
-        {canUnwrap && (needsUnwrapApproval ?
-        <Transaction submitText="Approve Full to Unwrap" writeArgs={{
-          address: chain.ghoToken,
-          abi: erc20ABI,
-          chainId: chain.chain,
-          functionName: 'approve',
-          args: [
-            chain.UniswapV3PositionFacilitator.address,
-            ghoMinted,
-          ],
-        }} /> : <Transaction submitText={ghoMinted > 0 ? "Repay Full and Unwrap" : "Unwrap"} writeArgs={{
-          ...chain.UniswapV3PositionFacilitator,
-          functionName: 'repayGhoAndUnwrap',
-          args: [ id ],
-        }} />)}
-        </>}
+            functionName: 'repayGhoWithPermit',
+            args: [
+              id,
+              BigInt(repayAmount) * (10n ** chain.ghoDecimals),
+              signData,
+              deadline
+            ],
+            onSuccess() {
+              resetSign();
+            },
+          }}
+        />
+        <Transaction
+          disabled={!canUnwrap || !signData}
+          submitText={ghoMinted > 0 ? "Repay Full and Unwrap" : "Unwrap"}
+          writeArgs={{
+            ...chain.UniswapV3PositionFacilitator,
+            functionName: 'repayGhoAndUnwrapWithPermit',
+            args: [ id, signData, deadline ],
+            onSuccess() {
+              resetSign();
+            },
+          }}
+        />
+      </>}
   </>);
 }

@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol";
 import "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import "openzeppelin-contracts/contracts/interfaces/IERC4906.sol";
 import "openzeppelin-contracts/contracts/interfaces/IERC165.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
@@ -67,7 +68,12 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
     return usd / (10 ** uint(decimals));
   }
 
-  function wrapAndMintGhoWithPermit(uint256 tokenId, uint256 mintAmount, bytes memory permit, uint256 permitDeadline) external {
+  function wrapAndMintGhoWithPermit(
+    uint256 tokenId,
+    uint256 mintAmount,
+    bytes memory permit,
+    uint256 permitDeadline
+  ) external {
     (bytes32 r, bytes32 s, uint8 v) = splitSignature(permit);
     INonfungiblePositionManager(positionInfo.positionManager()).permit(
       address(this), tokenId, permitDeadline, v, r, s);
@@ -97,6 +103,20 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
     emit GhoMinted(tokenId, mintAmount);
   }
 
+  function repayGhoWithPermit(
+    uint256 tokenId,
+    uint256 repayAmount,
+    bytes memory permit,
+    uint256 permitDeadline
+  ) public {
+    (bytes32 r, bytes32 s, uint8 v) = splitSignature(permit);
+    // IGhoToken doesn't have a permit method even though the deployed token does?
+    // Use same amount as unwrapping to simplify frontend
+    IERC20Permit(address(GHO_TOKEN)).permit(
+      msg.sender, address(this), ghoMintedByTokenId[tokenId], permitDeadline, v, r, s);
+    repayGho(tokenId, repayAmount);
+  }
+
   function repayGho(uint256 tokenId, uint256 repayAmount) public {
     if(repayAmount > ghoMintedByTokenId[tokenId])
       revert REPAY_UNDERFLOW();
@@ -106,11 +126,24 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
     emit GhoRepaid(tokenId, repayAmount);
   }
 
+  function repayGhoAndUnwrapWithPermit(
+    uint256 tokenId,
+    bytes memory permit,
+    uint256 permitDeadline
+  ) external {
+    repayGhoWithPermit(tokenId, ghoMintedByTokenId[tokenId], permit, permitDeadline);
+    _unwrap(tokenId);
+  }
+
   function repayGhoAndUnwrap(uint256 tokenId) external {
+    repayGho(tokenId, ghoMintedByTokenId[tokenId]);
+    _unwrap(tokenId);
+  }
+
+  function _unwrap(uint256 tokenId) internal {
     if(ownerOf(tokenId) != msg.sender)
       revert ONLY_POSITION_OWNER();
     _burn(tokenId);
-    repayGho(tokenId, ghoMintedByTokenId[tokenId]);
     IERC721(positionInfo.positionManager()).safeTransferFrom(address(this), msg.sender, tokenId);
     emit TokenUnwrapped(tokenId, msg.sender);
   }

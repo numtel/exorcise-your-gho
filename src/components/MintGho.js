@@ -31,7 +31,7 @@ export default function MintGho({
   } = useSignTypedData({
     domain: {
       version: '1',
-      name: 'Uniswap V3 Positions NFT-V1',
+      name: chain.posManName,
       chainId: chain.chain,
       verifyingContract: chain.NonfungiblePositionManager.address,
     },

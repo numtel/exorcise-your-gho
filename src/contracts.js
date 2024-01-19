@@ -10,8 +10,10 @@ export const byChain = {
     explorer: 'https://sepolia.etherscan.io/',
     poolManager: 'https://app.uniswap.org/pools/XXX?chain=sepolia',
     addLiquidity: 'https://app.uniswap.org/add/',
-    ghoToken: '0x36A93a593c9c149197369D36d199DAA15EedF3D2',
+    ghoToken: '0x4488A882FD9f26B992d4c37113964fDB0eFc13a4',
+    ghoTokenName: 'Fake GHO',
     ghoDecimals: 18n,
+    posManName: 'Uniswap V3 Positions NFT-V1',
     nativeCurrency: 'sETH',
     allowedPools: [
       ['0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8',
@@ -19,7 +21,7 @@ export const byChain = {
        'GHO/USDC'],
     ],
     UniswapV3PositionFacilitator: {
-      address: '0x07c391096511c7f004De0b92CcF303658003D3DD',
+      address: '0xf7CA3DA647B345B7107E890ABf1036f4e5dDEE29',
       abi: UniswapV3PositionFacilitatorABI,
       chainId: 11155111,
     },
