@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useContractReads } from 'wagmi';
+import { useSignTypedData } from 'wagmi';
 import { isAddressEqual } from 'viem';
 
 import { chainContracts } from '../contracts.js';
@@ -11,6 +11,7 @@ export default function MintGho({
   positionValue,
   ghoMinted,
   isWrapped,
+  position,
 }) {
   const [ global ] = useContext(GlobalContext);
   const [ mintAmount, setMintAmount ] = useState('0');
@@ -18,15 +19,49 @@ export default function MintGho({
   const ghoMintedHuman = ghoMinted / 10n ** chain.ghoDecimals;
   const maxAmount = global.basis ? (positionValue * global.maxLTV / global.basis) - ghoMintedHuman : 0n;
 
-  const { data, isError, isLoading } = useContractReads({
-    contracts: [
-      {
-        ...chain.NonfungiblePositionManager,
-        functionName: 'getApproved',
-        args: [ id ],
-      },
-    ],
-    watch: true,
+  const [ deadline, setDeadline ] = useState(
+    Math.floor(Date.now() / 1000) + (60 * 60 * 24)); // 24 hours from now
+
+  const {
+    data: signData,
+    isError: signError,
+    isLoading: signLoading,
+    isSuccess: signSuccess,
+    signTypedData
+  } = useSignTypedData({
+    domain: {
+      version: '1',
+      name: 'Uniswap V3 Positions NFT-V1',
+      chainId: chain.chain,
+      verifyingContract: chain.NonfungiblePositionManager.address,
+    },
+    message: {
+      spender: chain.UniswapV3PositionFacilitator.address,
+      tokenId: id,
+      nonce: position[0],
+      deadline,
+    },
+    primaryType: 'Permit',
+    types: {
+      Permit: [
+        {
+          name: 'spender',
+          type: 'address',
+        },
+        {
+          name: 'tokenId',
+          type: 'uint256',
+        },
+        {
+          name: 'nonce',
+          type: 'uint256',
+        },
+        {
+          name: 'deadline',
+          type: 'uint256',
+        },
+      ],
+    },
   });
 
   return (<>
@@ -48,28 +83,28 @@ export default function MintGho({
       }}>
         {String(maxAmount)} GHO
       </a></> : global.basis === false ? <>Error, try refreshing!</> : <>Loading...</>}</p>
-    {isLoading ? <p>Loading status...</p> :
-      isError ? <p>Error loading status.</p> :
-      isWrapped ?
-        <Transaction submitText="Mint GHO"
-          disabled={mintAmount < 1}
-          writeArgs={{
-            ...chain.UniswapV3PositionFacilitator,
-            functionName: 'mintGho',
-            args: [ id, BigInt(mintAmount) * (10n ** chain.ghoDecimals) ],
-          }} /> :
-      data && isAddressEqual(data[0].result, chain.UniswapV3PositionFacilitator.address) ?
-        <Transaction submitText="Wrap and Mint GHO" writeArgs={{
+    {isWrapped ?
+      <Transaction submitText="Mint GHO"
+        disabled={mintAmount < 1}
+        writeArgs={{
           ...chain.UniswapV3PositionFacilitator,
-          functionName: 'wrapAndMintGho',
+          functionName: 'mintGho',
           args: [ id, BigInt(mintAmount) * (10n ** chain.ghoDecimals) ],
         }} /> :
-      data ?
-        <Transaction submitText="Approve Wrap" writeArgs={{
-          ...chain.NonfungiblePositionManager,
-          functionName: 'approve',
-          args: [ chain.UniswapV3PositionFacilitator.address, id ],
-        }} /> :
-      <p>Unknown error! Refresh.</p>}
+      <>
+        <button disabled={signData} type="button" onClick={signTypedData}>
+          Sign Wrap Permit
+        </button>
+        <Transaction disabled={!signData} submitText="Wrap and Mint GHO" writeArgs={{
+          ...chain.UniswapV3PositionFacilitator,
+          functionName: 'wrapAndMintGhoWithPermit',
+          args: [
+            id,
+            BigInt(mintAmount) * (10n ** chain.ghoDecimals),
+            signData,
+            deadline,
+          ],
+        }} />
+    </>}
   </>);
 }

@@ -67,7 +67,14 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
     return usd / (10 ** uint(decimals));
   }
 
-  function wrapAndMintGho(uint256 tokenId, uint256 mintAmount) external {
+  function wrapAndMintGhoWithPermit(uint256 tokenId, uint256 mintAmount, bytes memory permit, uint256 permitDeadline) external {
+    (bytes32 r, bytes32 s, uint8 v) = splitSignature(permit);
+    INonfungiblePositionManager(positionInfo.positionManager()).permit(
+      address(this), tokenId, permitDeadline, v, r, s);
+    wrapAndMintGho(tokenId, mintAmount);
+  }
+
+  function wrapAndMintGho(uint256 tokenId, uint256 mintAmount) public {
     IERC721(positionInfo.positionManager()).safeTransferFrom(msg.sender, address(this), tokenId);
     _mint(msg.sender, tokenId);
     _mintGho(tokenId, mintAmount);
@@ -175,6 +182,21 @@ contract UniswapV3PositionFacilitator is Ownable, ERC721Enumerable, IERC721Recei
     pauseMints = _pauseMints;
     pauseLiquidations = _pauseLiquidations;
   }
+
+  // From https://solidity-by-example.org/signature/
+  function splitSignature(bytes memory sig) internal pure
+    returns (bytes32 r, bytes32 s, uint8 v)
+  {
+    require(sig.length == 65, "invalid signature length");
+    assembly {
+        // first 32 bytes, after the length prefix
+        r := mload(add(sig, 32))
+        // second 32 bytes
+        s := mload(add(sig, 64))
+        // final byte (first byte of the next 32 bytes)
+        v := byte(0, mload(add(sig, 96)))
+    }
+  }
 }
 
 // Uniswap repo uses Solidity 0.7.6, easier to include this here
@@ -187,5 +209,15 @@ interface INonfungiblePositionManager {
     }
 
     function collect(CollectParams calldata params) external payable returns (uint256 amount0, uint256 amount1);
+
+    function permit(
+        address spender,
+        uint256 tokenId,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external payable;
 }
+
 

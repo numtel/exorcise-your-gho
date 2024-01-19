@@ -58,7 +58,7 @@ export default function RenderPosition({
         <div className="actions">
           {isLiquidation ? <Liquidate {...{id, positionValue, ghoMinted}} /> : <>
             <div className="action">
-              <MintGho {...{id, positionValue, ghoMinted, isWrapped}} />
+              <MintGho {...{id, positionValue, ghoMinted, isWrapped, position}} />
             </div>
             {isWrapped && <div className="action">
               <RepayGho {...{id, positionValue, ghoMinted, isWrapped}} />

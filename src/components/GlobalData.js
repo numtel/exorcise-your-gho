@@ -6,7 +6,12 @@ import { chainContracts } from '../contracts.js';
 export const GlobalContext = createContext(null);
 
 export function GlobalData({children}) {
-  const globalState = useState({});
+  const globalState = useState({
+    // Provide values before waiting for load
+    basis: 1000n,
+    maxLTV: 900n,
+    liquidate: 950n,
+  });
   const chain = chainContracts();
 
   useContractReads({
